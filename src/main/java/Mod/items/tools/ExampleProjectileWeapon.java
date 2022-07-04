@@ -1,5 +1,6 @@
-package examplemod.examples;
+package Mod.items.tools;
 
+import Mod.examples.ExampleProjectile;
 import necesse.engine.Screen;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.PacketReader;

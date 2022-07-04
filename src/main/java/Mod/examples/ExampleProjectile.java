@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.examples;
 
 import necesse.engine.tickManager.TickManager;
 import necesse.entity.mobs.GameDamage;

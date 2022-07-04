@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.level.gameTile;
 
 import necesse.engine.util.GameRandom;
 import necesse.gfx.gameTexture.GameTexture;

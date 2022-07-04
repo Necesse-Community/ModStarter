@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.patches.example;
 
 import necesse.engine.modLoader.annotations.ModConstructorPatch;
 import necesse.entity.mobs.friendly.critters.RabbitMob;

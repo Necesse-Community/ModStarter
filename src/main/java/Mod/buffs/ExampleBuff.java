@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.buffs;
 
 import necesse.entity.mobs.buffs.ActiveBuff;
 import necesse.entity.mobs.buffs.BuffModifiers;

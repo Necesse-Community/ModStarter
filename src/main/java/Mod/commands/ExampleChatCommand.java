@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.commands;
 
 import necesse.engine.commands.CmdParameter;
 import necesse.engine.commands.CommandLog;

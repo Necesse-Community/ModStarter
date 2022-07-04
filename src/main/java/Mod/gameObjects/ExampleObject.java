@@ -1,4 +1,4 @@
-package examplemod.examples;
+package Mod.gameObjects;
 
 import necesse.engine.tickManager.TickManager;
 import necesse.entity.mobs.PlayerMob;
