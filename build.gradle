@@ -30,6 +30,9 @@ project.ext.clientside = false
 // The path to the games install directory
 def gameDirectory = "G:\\SteamLibrary\\steamapps\\common\\Necesse"
 
+// Path to put decompiled sources in
+def decompileDir = "$gameDirectory/decompiled"
+
 // =================================================
 // ========== DO NOT EDIT BELOW THIS LINE ==========
 // =================================================
@@ -45,6 +48,8 @@ setTargetCompatibility(JavaVersion.VERSION_1_8)
 
 repositories {
     mavenCentral()
+    // for the decompiler plugin
+    maven { url "https://www.jetbrains.com/intellij-repository/releases" }
 }
 
 sourceSets.main.output.resourcesDir = file("build/mod/resources/")
@@ -57,10 +62,18 @@ if (!file(gameDirectory + "/Necesse.jar").exists()) {
     throw new Exception("Could not find game install directory. Make sure it is correct in build.gradle file.")
 }
 
+configurations {
+    runnable { description "For runnable JARs to be ran only on building." }
+}
+
 dependencies {
     implementation files(gameDirectory + "/Necesse.jar")
     implementation fileTree(gameDirectory + "/lib/")
     implementation fileTree("./mods/") // Add all mods located in local mods folder
+
+    // Decompiler to produce decompiled game sources, so that IDE features like Find Usages can work nicely.
+    // Will not be referenced from the game/mod
+    runnable 'com.jetbrains.intellij.java:java-decompiler-engine:221.5921.22'
 }
 
 classes.doLast {
@@ -85,6 +98,27 @@ task createAppID {
     doLast {
         new File("steam_appid.txt").text = "1169040"
     }
+}
+
+task decompileToSources(type: JavaExec) {
+    outputs.upToDateWhen {
+        ant.checksum file: "$gameDirectory/Necesse.jar", todir: gameDirectory, fileext: '.sum'
+        return file("$gameDirectory/Necesse.jar.sum").exists() &&
+                file("$decompileDir/origin.jar.sum").exists() &&
+                file("$gameDirectory/Necesse.jar.sum").text == file("$decompileDir/origin.jar.sum").text
+    }
+    doFirst { mkdir decompileDir }
+    doLast {
+        ant.move file: "$gameDirectory/Necesse.jar.sum", tofile: "$decompileDir/origin.jar.sum", overwrite: true
+        ant.move file: "$decompileDir/Necesse.jar", tofile: "$decompileDir/Necesse-sources.jar", overwrite: true
+    }
+
+    classpath configurations.runnable
+
+    def banner = "/*\n * NOTE: Decompiled Necesse.jar sources for modding use only. Redistribution is strictly prohibited.\n */\n\n\n"
+    // decompiler preferences referred from https://github.com/JetBrains/intellij-community/blob/master/plugins/java-decompiler/plugin/src/org/jetbrains/java/decompiler/IdeaDecompiler.kt
+    main 'org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler'
+    args '-hdc=0', '-dgs=1', '-rsy=1', '-rbr=1', '-nls=1', '-mpm=60', '-vac=1', '-bsm=1', '-dol=1', '-iib=1', '-ind=    ', "-ban=$banner", "$gameDirectory/Necesse.jar", decompileDir
 }
 
 task runClient(type: JavaExec) {
